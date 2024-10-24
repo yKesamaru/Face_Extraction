@@ -75,7 +75,7 @@ https://ykesamaru.github.io/FACE01_DEV/index.html
 >
 > ![dlib学習モデルで偽陽性を出す例](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/2024-08-25-12-55-59.png)
 >
-> これに対し、新しく学習されたモデル「JAPANESE FACE」（下のグラフではJAPANESE_FACE_V1.onnx））では、精度を落とすことなく判別できていることが示されました。
+> これに対し、新しく学習されたモデル「JAPANESE FACE」（下のグラフではefficientnetv2_arcface.onnx）では、精度を落とすことなく判別できていることが示されました。
 > 
 > ![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/2024-08-25-13-01-14.png)
 >
