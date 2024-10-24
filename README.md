@@ -63,7 +63,9 @@ https://github.com/yKesamaru/FACE01_DEV
 
 https://ykesamaru.github.io/FACE01_DEV/index.html
 
-また付属している顔学習モデル([`JAPANESE FACE V1`](https://github.com/yKesamaru/FACE01_trained_models)[^2])は日本人専用として学習されており、フリーで使える顔学習モデルとしては、おそらく日本一の精度を誇ります。
+また付属している顔学習モデル([`JAPANESE FACE V1`](https://github.com/yKesamaru/FACE01_trained_models)[^2])は日本人専用として学習されており、フリーで使える顔学習モデル[^3]としては、おそらく日本一の精度を誇ります。
+
+[^3]: 「実稼動」以外はアパッチライセンスです。くわしくは[LICENSE](https://github.com/yKesamaru/FACE01_DEV/tree/master/LICENSE)を参照してください。
 
 [^2]: [日本人顔認識のための学習モデル](https://github.com/yKesamaru/FACE01_trained_models)
 
@@ -117,7 +119,7 @@ https://zenn.dev/ykesamaru/articles/add7d844f56516
 
 ### コンテナを起動する
 
-永続化のためのフォルダを指定しておきたいので、[以下のようにしてコンテナを起動](https://ykesamaru.github.io/FACE01_DEV/step_by_step/docker.html#dockerguixhost)します。
+ホストと共有するフォルダを指定しておきたいので、[以下のようにしてコンテナを起動](https://ykesamaru.github.io/FACE01_DEV/step_by_step/docker.html#dockerguixhost)します。
 
 ```bash
 docker run -it \
@@ -127,7 +129,7 @@ docker run -it \
     <image id>
 ```
 
-![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-16-42-37.png)
+<!-- ![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-16-42-37.png) -->
 
 `/home/user/ドキュメント/Face_Extraction/assets/`ディレクトリに`interview.mp4`としてテスト用動画を用意してあります。
 
