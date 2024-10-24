@@ -19,7 +19,7 @@
 > 
 > なおこの記事で取り扱うサンプル動画は記事を作成するための例であって、このサンプルを使って顔学習モデルを作製しているわけではないことをおことわりします。
 
-![](assets/eye-catch.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/eye-catch.png)
 
 - [はじめに](#はじめに)
 - [ホスト環境](#ホスト環境)
@@ -82,14 +82,14 @@ https://ykesamaru.github.io/FACE01_DEV/index.html
 > くわしくは、「[Dlib顔学習モデルの、若年日本人女性データセットにおける性能評価](https://tokai-kaoninsho.com/%e3%82%b3%e3%83%a9%e3%83%a0/dlib%e9%a1%94%e5%ad%a6%e7%bf%92%e3%83%a2%e3%83%87%e3%83%ab%e3%81%ae%e3%80%81%e8%8b%a5%e5%b9%b4%e6%97%a5%e6%9c%ac%e4%ba%ba%e5%a5%b3%e6%80%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%bb%e3%83%83%e3%83%88/)」からご覧いただけます。
 
 
-この記事では「動画ファイル中の任意の人物の顔画像ファイルを、フレームごとに抽出・保存する」機能を使用します。
+この記事では「*動画ファイル中の任意の人物の顔画像ファイルを、フレームごとに抽出・保存する*」機能を使用します。
 
 ## FACE01を使用する
 ### FACE01をDOCKERで導入
 
 [下記](https://ykesamaru.github.io/FACE01_DEV/step_by_step/docker.html)に書いてあるとおりに`Docker image`をプルします。
 
-![](assets/2024-10-23-16-34-21.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-16-34-21.png)
 
 ```bash
 docker pull tokaikaoninsho/face01_gpu
@@ -127,7 +127,7 @@ docker run -it \
     <image id>
 ```
 
-![](assets/2024-10-23-16-42-37.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-16-42-37.png)
 
 `/home/user/ドキュメント/Face_Extraction/assets/`ディレクトリに`interview.mp4`としてテスト用動画を用意してあります。
 
@@ -194,7 +194,7 @@ docker@056e52013385:~/FACE01_DEV$ . bin/activate
 (FACE01_DEV) docker@a5f5d24d9fba:~/FACE01_DEV$ gedit config.ini
 ```
 
-![](assets/2024-10-23-19-17-39.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-19-17-39.png)
 
 デフォルトで幾つかのセクションが用意されています。すべてのセクションは`[DEFAULT]`セクションを継承します。
 
@@ -202,7 +202,7 @@ docker@056e52013385:~/FACE01_DEV$ . bin/activate
 
 くわしくは[こちら](https://ykesamaru.github.io/FACE01_DEV/step_by_step/config_ini.html)をご参照ください。
 
-![](assets/2024-10-23-20-32-42.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-23-20-32-42.png)
 
 今回は本格的な運用ではないため、予め用意されている`[DISPLAY_GUI]`セクションを直接編集しました。
 
@@ -228,9 +228,9 @@ number_of_crops = 0
 ```
 
 ### 顔画像ファイルを設置する
-次に、顔画像ファイルを保存します。（224x224px）
+顔画像ファイルを設置します。（224x224px）
 
-![](assets/阿部慎之助_default.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/阿部慎之助_default.png)
 
 これを`~/FACE01_DEV/preset_face_images/`ディレクトリにコピーします。
 
@@ -258,7 +258,7 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 
 実行すると以下のようなウィンドウが開き、処理が進んでいきます。
 
-![](assets/output.gif)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/output.gif)
 
 ### ホスト側に顔画像ファイルを移動する
 コンテナからホストのディスクに顔クロップ画像をコピーしましょう。
@@ -269,14 +269,15 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 
 これによって、以下のように顔クロップ画像が収集できました。
 
-![](assets/2024-10-24-12-02-53.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-24-12-02-53.png)
 
 
 ## おわりに
-`FACE01`顔認識フレームワークを使用すると、顔認識関連の処理がかんたんに行えます。
+`FACE01`顔認識フレームワークを使用すると、`docker`に抵抗ない方なら顔認識関連の処理がかんたんに行えます。
 
+じつは大量の動画ファイルから顔画像をクロップして保存する作業があり、`FACE01`のドキュメントを見ながら作業を行いました。
 
+とっかかりは面倒くさそうですけど、コンテナに入ってしまえば後は楽ちんでした。ぜひ皆様もつかってみてください。
 
-
-
+最後までお読み頂きありがとうございました。
 
