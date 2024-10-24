@@ -1,27 +1,31 @@
 ## はじめに
-顔画像データセットを作成する際、一般的にはクローリングによって作成するかと思います。
-この方法だとデータのクリーニングが大変です。
-- 自撮り加工が大変多い
+顔画像データセットを作成する際、一昔前まで一般的にクローリングによって作成されていたかと思います。
+
+しかしこの方法だと様々な問題が山積します。
+
+- データセットとしてのプライバシーや肖像権の問題
+- 自撮り加工が多すぎる
 - 関連した別人が混ざる
 - 年齢差が大きすぎるデータが混ざる
 - ぼやけている
-これらを最終的には目視で行わなければなりません。
-`JAPANESE FACE V1`[^1]を作製した時は、最終チェックはすべて目視で行いました。
-[^1]: [日本人顔認識のための学習モデル](https://github.com/yKesamaru/FACE01_trained_models)
 
-これとは異なる方法として、インタビューなどの動画から顔画像データを抽出する方法も存在します。
-人数をかせぐことは出来ませんが、上記のデメリットはすべて解消されます。
+これらを解決する方法として、インタビュー形式の動画から顔画像データを抽出する方法が存在します。
 
-この記事では後者の「インタビューなどの動画から顔画像データを抽出する方法」について、`FACE01`[^2]を使って行います。
-[^2]: [FACE01は日本人の顔に最適化された顔学習モデルJAPANESE FACEと、Pythonで書かれたオープンソースのリファレンス実装です。](https://github.com/yKesamaru/FACE01_DEV)
+この記事では後者の「インタビューなどの動画から顔画像データを抽出する方法」について、`FACE01`[^1]を使って行います。
+
+[^1]: [FACE01は日本人の顔に最適化された顔学習モデルJAPANESE FACEと、Pythonで書かれたオープンソースのリファレンス実装・顔認識フレームワークです。](https://github.com/yKesamaru/FACE01_DEV)
+
+> [!NOTE]
+> 
+> なおこの記事で取り扱うサンプル動画は記事を作成するための例であって、このサンプルを使って顔学習モデルを作製しているわけではないことをおことわりします。
 
 ![](assets/eye-catch.png)
 
 - [はじめに](#はじめに)
 - [ホスト環境](#ホスト環境)
-- [環境構築](#環境構築)
-  - [FACE01をDOCKERで導入](#face01をdockerで導入)
+- [FACE01とは](#face01とは)
 - [FACE01を使用する](#face01を使用する)
+  - [FACE01をDOCKERで導入](#face01をdockerで導入)
   - [コンテナを起動する](#コンテナを起動する)
   - [Python仮想環境をアクティベートする](#python仮想環境をアクティベートする)
   - [ホストディレクトリが繋がっているか確認する](#ホストディレクトリが繋がっているか確認する)
@@ -45,8 +49,44 @@ System:
 
 > `FACE01`は`RTSP`、`HTTP`などの入力を使用できますが、今回はそこが主眼ではないので予め`interview.mp4`として用意しました。
 
-## 環境構築
+## FACE01とは
+
+`FACE01`はオープンソースの顔認識フレームワークです。
+
+https://github.com/yKesamaru/FACE01_DEV
+
+**`FACE01`顔認識フレームワークは、RTSP・HTTP・USBなどの入力プロトコルから顔認識・画像処理をかんたんに行えます。**
+
+詳細なドキュメントと多くのエグザンプルコードの他に、初心者の方を対象にした「ステップ・バイ・ステップ」が付属するので、どんな方でもかんたんに顔認識に付随する処理を行えます。
+
+[FACE01_DEV ドキュメント](https://ykesamaru.github.io/FACE01_DEV/index.html)
+
+https://ykesamaru.github.io/FACE01_DEV/index.html
+
+また付属している顔学習モデル([`JAPANESE FACE V1`](https://github.com/yKesamaru/FACE01_trained_models)[^2])は日本人専用として学習されており、フリーで使える顔学習モデルとしては、おそらく日本一の精度を誇ります。
+
+[^2]: [日本人顔認識のための学習モデル](https://github.com/yKesamaru/FACE01_trained_models)
+
+> 日本人の顔認証に特化した学習モデルは、一般的な顔認証システムが抱える問題(若年日本人女性に対する偽陽性)を解決しました。
+> 
+> たとえば、一般的な学習モデルの場合、以下に示すような若年日本人女性の判別が難しい場合があります。
+>
+> ![dlib学習モデルで偽陽性を出す例](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/2024-08-25-12-55-59.png)
+>
+> これに対し、新しく学習されたモデル「JAPANESE FACE」（下のグラフではJAPANESE_FACE_V1.onnx））では、精度を落とすことなく判別できていることが示されました。
+> 
+> ![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/2024-08-25-13-01-14.png)
+>
+> 若年日本人女性の顔画像に対して、DlibのAUCが0.94に対し、JAPANESE FACEは0.98を達成しています⭐️''。
+>
+> くわしくは、「[Dlib顔学習モデルの、若年日本人女性データセットにおける性能評価](https://tokai-kaoninsho.com/%e3%82%b3%e3%83%a9%e3%83%a0/dlib%e9%a1%94%e5%ad%a6%e7%bf%92%e3%83%a2%e3%83%87%e3%83%ab%e3%81%ae%e3%80%81%e8%8b%a5%e5%b9%b4%e6%97%a5%e6%9c%ac%e4%ba%ba%e5%a5%b3%e6%80%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%bb%e3%83%83%e3%83%88/)」からご覧いただけます。
+
+
+この記事では「動画ファイル中の任意の人物の顔画像ファイルを、フレームごとに抽出・保存する」機能を使用します。
+
+## FACE01を使用する
 ### FACE01をDOCKERで導入
+
 [下記](https://ykesamaru.github.io/FACE01_DEV/step_by_step/docker.html)に書いてあるとおりに`Docker image`をプルします。
 
 ![](assets/2024-10-23-16-34-21.png)
@@ -55,7 +95,7 @@ System:
 docker pull tokaikaoninsho/face01_gpu
 ```
 
-確認。（ここでは予めダウンロードしておいた`Docker image`がリストされています。）
+ダウンロードしたイメージを確認します。（ここでは予めダウンロードしておいた`Docker image`がリストされています。）
 
 ```bash
 $ docker images
@@ -75,7 +115,6 @@ xhost +local:
 
 https://zenn.dev/ykesamaru/articles/add7d844f56516
 
-## FACE01を使用する
 ### コンテナを起動する
 
 永続化のためのフォルダを指定しておきたいので、[以下のようにしてコンテナを起動](https://ykesamaru.github.io/FACE01_DEV/step_by_step/docker.html#dockerguixhost)します。
@@ -90,21 +129,8 @@ docker run -it \
 
 ![](assets/2024-10-23-16-42-37.png)
 
-以下はドキュメントに実際描かれている内容の転載です。
-
-> ここで、'/path/to/host/folder'はホスト側の永続化したいデータを保存するフォルダパスを指定し、'/path/to/container/folder'はコンテナ内でそのデータを利用するためのフォルダパスを指定します。
-> 
-> 例えば、ホストの'/home/user/dataフォルダ'をコンテナ内の'/mnt/data'にマウントしたい場合は、以下のようになります。
-> 
-> ```bash
-> docker run -it \
->     --gpus all -e DISPLAY=$DISPLAY \
->     -v /tmp/.X11-unix:/tmp/.X11-unix \
->     -v /home/user/data:/mnt/data \
->     <image id>
-> ```
-
 `/home/user/ドキュメント/Face_Extraction/assets/`ディレクトリに`interview.mp4`としてテスト用動画を用意してあります。
+
 今回はこの動画ファイルから顔画像ファイルを抽出したいので、このディレクトリを指定してコンテナを起動します。
 
 ```bash
@@ -159,31 +185,26 @@ docker@056e52013385:~/FACE01_DEV$ . bin/activate
 `/mnt/data/interview.mp4`に対して、顔画像ファイル抽出処理をしていきます。
 
 ### `config.ini`を調整する
-`FACE01`の`DOCKER`イメージには`gedit`テキストエディタが付属します。`vim`も付属するので好きな方を選んで起動してください。
+`FACE01`では多様な使い方を想定して`config.ini`ファイルを使って初期設定を行います。
+
+`config.ini`編集のために、`FACE01`の`DOCKER`イメージには`gedit`テキストエディタが付属します。`vim`も付属するので好きな方を選んで起動してください。
+
 
 ```bash
-(FACE01_DEV) docker@a5f5d24d9fba:~/FACE01_DEV$ ls
-Docker_INSTALL_FACE01.sh  assets  build       docs     face01lib  lib    noFace  preset_face_images  pyvenv.cfg            share
-SystemCheckLock           bin     config.ini  example  include    lib64  output  pyproject.toml      requirements_dev.txt
-(FACE01_DEV) docker@a5f5d24d9fba:~/FACE01_DEV$ gedit config.ini 
-
-(gedit:34): dbind-WARNING **: 19:16:54.532: Couldn't connect to accessibility bus: Failed to connect to socket /run/user/1000/at-spi/bus_1: そのようなファイルやディレクトリはありません
-
-** (gedit:34): WARNING **: 19:16:54.880: Could not load theme icon text-x-generic: Icon 'text-x-generic' not present in theme Yaru-red
+(FACE01_DEV) docker@a5f5d24d9fba:~/FACE01_DEV$ gedit config.ini
 ```
 
 ![](assets/2024-10-23-19-17-39.png)
 
-基本的に`FACE01`は`config.ini`ファイルを編集して設定を行います。
-
 デフォルトで幾つかのセクションが用意されています。すべてのセクションは`[DEFAULT]`セクションを継承します。
-新しいセクションを作成するには`[DEFAULT]`セクションから変更する部分だけを抽出して設定してください。
+
+新しいセクションを作成するには`[DEFAULT]`セクションから変更する部分だけを抽出して設定します。
 
 くわしくは[こちら](https://ykesamaru.github.io/FACE01_DEV/step_by_step/config_ini.html)をご参照ください。
 
 ![](assets/2024-10-23-20-32-42.png)
 
-今回は予め用意されている`[DISPLAY_GUI]`セクションを元に内容を変更します。
+今回は本格的な運用ではないため、予め用意されている`[DISPLAY_GUI]`セクションを直接編集しました。
 
 ```bash
 [DISPLAY_GUI]
@@ -207,15 +228,13 @@ number_of_crops = 0
 ```
 
 ### 顔画像ファイルを設置する
-次に、`interview.mp4`からとった顔画像ファイルを保存します。
+次に、顔画像ファイルを保存します。（224x224px）
 
 ![](assets/阿部慎之助_default.png)
 
-これを以下のディレクトリにコピーします。
+これを`~/FACE01_DEV/preset_face_images/`ディレクトリにコピーします。
 
-`~/FACE01_DEV/preset_face_images/`
-
-コピーする際パスワードを聞かれます。パスワードは`docker`です。
+コピーする際パスワードを聞かれたら`docker`と入力します。
 
 ```bash
 (FACE01_DEV) docker@a5f5d24d9fba:~/FACE01_DEV$ ls /mnt/data
@@ -228,7 +247,6 @@ sudo cp /mnt/data/阿部慎之助_default.png ~/FACE01_DEV/preset_face_images/
 [sudo] docker のパスワード: 
 ```
 
-
 ### エグザンプルコードを動作させる
 コードは[`example/display_GUI_window.py`](https://github.com/yKesamaru/FACE01_DEV/blob/master/example/display_GUI_window.py#L1)を使用します。
 
@@ -238,20 +256,24 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 (FACE01_DEV) docker@b8ddca6a1b03:~/FACE01_DEV$ python ./example/display_GUI_window.py
 ```
 
+実行すると以下のようなウィンドウが開き、処理が進んでいきます。
+
 ![](assets/output.gif)
 
 ### ホスト側に顔画像ファイルを移動する
+コンテナからホストのディスクに顔クロップ画像をコピーしましょう。
+
 ```bash
 (FACE01_DEV) docker@b8ddca6a1b03:~/FACE01_DEV$ mv ./output/*.png /mnt/data/output/
 ```
 
-これによって、ホスト側にクロップされた顔画像ファイルを移しました。
+これによって、以下のように顔クロップ画像が収集できました。
 
 ![](assets/2024-10-24-12-02-53.png)
 
 
 ## おわりに
-
+`FACE01`顔認識フレームワークを使用すると、顔認識関連の処理がかんたんに行えます。
 
 
 
