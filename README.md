@@ -310,9 +310,9 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 ### 顔画像をアライメントする
 `ドキュメントのexample.aligned_crop_face module`をご参照ください。
 
-![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/before_align.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/before_align.png)
 
-![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/after_align.png)
+![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/after_align.png)
 
 #### 使用法
 ```bash
