@@ -303,7 +303,7 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 あるいは`example/display_GUI_window_JAPANESE_FACE_V1.py`を使用する場合、最終行を以下のように`gedit`で修正します。これは動画の処理が途中で終了するのを防ぐためです。
 
 ```diff: example/display_GUI_window_JAPANESE_FACE_V1.py
-- main(exec_times=20000)
+- main(exec_times=200)
 + main(exec_times=20000)
 ```
 
