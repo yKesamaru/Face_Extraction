@@ -1,4 +1,7 @@
 ## はじめに
+
+追記：2024年11月18日
+
 顔画像データセットを作成する際、一昔前まで一般的にクローリングによって作成されていたかと思います。
 
 しかしこの方法だと様々な問題が山積します。
@@ -33,6 +36,8 @@
   - [顔画像ファイルを設置する](#顔画像ファイルを設置する)
   - [エグザンプルコードを動作させる](#エグザンプルコードを動作させる)
   - [ホスト側に顔画像ファイルを移動する](#ホスト側に顔画像ファイルを移動する)
+  - [顔画像をアライメントする](#顔画像をアライメントする)
+    - [使用法](#使用法)
 - [おわりに](#おわりに)
 
 
@@ -208,6 +213,12 @@ docker@056e52013385:~/FACE01_DEV$ . bin/activate
 
 今回は本格的な運用ではないため、予め用意されている`[DISPLAY_GUI]`セクションを直接編集しました。
 
+追加として、`[JAPANESE_FACE_V1_MODEL_GUI]`の設定も載せます。これを使用する場合は以下のように入力してください。
+
+```bash
+(FACE01_DEV) docker@ea169daa7cbc:~/FACE01_DEV$ python example/display_GUI_window_JAPANESE_FACE_V1.py &
+```
+
 ```bash
 [DISPLAY_GUI]
 # [DISPLAY_GUI] section is example for display window.
@@ -227,6 +238,22 @@ show_percentage = True
 show_name = True
 frame_skip = 2
 number_of_crops = 0
+
+[JAPANESE_FACE_V1_MODEL_GUI]
+headless = False
+frame_skip = 10
+movie = ../test/test6.mp4
+deep_learning_model = 1
+similar_percentage = 90.0
+target_rectangle = True
+draw_telop_and_logo = False
+default_face_image_draw = False
+show_overlay = False
+alpha = 0.3
+show_percentage = False
+show_name = False
+set_width = 1920
+frequency_crop_image = 1
 ```
 
 ### 顔画像ファイルを設置する
@@ -273,6 +300,46 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 
 ![](https://raw.githubusercontent.com/yKesamaru/Face_Extraction/master/assets/2024-10-24-12-02-53.png)
 
+あるいは`example/display_GUI_window_JAPANESE_FACE_V1.py`を使用する場合、最終行を以下のように`gedit`で修正します。これは動画の処理が途中で終了するのを防ぐためです。
+
+```diff: example/display_GUI_window_JAPANESE_FACE_V1.py
+- main(exec_times=20000)
++ main(exec_times=20000)
+```
+
+### 顔画像をアライメントする
+`ドキュメントのexample.aligned_crop_face module`をご参照ください。
+
+![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/before_align.png)
+
+![](https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/after_align.png)
+
+#### 使用法
+```bash
+(FACE01_DEV) docker@ea169daa7cbc:~/FACE01_DEV$ python example/aligned_crop_face.py ../test
+```
+
+ソースコードは[こちら](https://github.com/yKesamaru/FACE01_DEV/blob/master/example/aligned_crop_face.py)です。
+
+今回はDocker image内の`example/aligned_crop_face.py`を以下のように変更して使用しました。
+
+
+
+```diff: example/aligned_crop_face.py
+- utils.align_and_resize_maintain_aspect_ratio(
+-     path,
+-     upper_limit_length=1024,
+-     padding=0.1,
+-     size=400
+- )
+
++ utils.align_and_resize_maintain_aspect_ratio(
++     path,
++     upper_limit_length=1024,
++     padding=0.1,
++     size=400
++ )
+```
 
 ## おわりに
 `FACE01`顔認識フレームワークを使用すると、`docker`に抵抗ない方なら顔認識関連の処理がかんたんに行えます。
