@@ -39,6 +39,7 @@
   - [顔画像をアライメントする](#顔画像をアライメントする)
     - [使用法](#使用法)
 - [おわりに](#おわりに)
+- [追記](#追記)
 
 
 ## ホスト環境
@@ -350,3 +351,73 @@ https://github.com/yKesamaru/FACE01_DEV/blob/1cab4e4ceeeea45888d4f54f6c8da1be34e
 
 最後までお読み頂きありがとうございました。
 
+## 追記
+2024年11月28日
+
+一連のコマンドをまとめておきます。各コマンドをコピペするだけでインタビュー入力動画からアラインメントされた顔画像を抽出することが出来ます。
+
+```bash
+xhost +local:
+
+docker run -it \
+    --gpus all -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /home/terms/ドキュメント/FACE01_mnt_Folder:/home/docker/test \
+    1c63aae7b15d
+
+. bin/activate
+
+gedit config.ini &
+
+--------------------------------------
+[JAPANESE_FACE_V1_MODEL_GUI]
+headless = False
+frame_skip = 5
+
+movie = ../test/test8.mp4
+
+deep_learning_model = 1
+similar_percentage = 90.0
+target_rectangle = True
+draw_telop_and_logo = False
+default_face_image_draw = False
+show_overlay = False
+alpha = 0.3
+show_percentage = False
+show_name = False
+set_width = 1920
+frequency_crop_image = 1
+--------------------------------------
+
+gedit example/aligned_crop_face.py &
+
+--------------------------------------
+    utils.align_and_resize_maintain_aspect_ratio(
+        path,
+        upper_limit_length=1024,
+        padding=0.1,
+        size=600
+    )
+--------------------------------------
+
+gedit example/display_GUI_window_JAPANESE_FACE_V1.py &
+
+--------------------------------------
+    # tkinterウィンドウの作成
+    root = tk.Tk()
+    root.title('FACE01 example with JAPANESE_FACE_V1 model')
+    root.geometry('100x100')
+--------------------------------------
+
+python example/display_GUI_window_JAPANESE_FACE_V1.py && zenity --info --text="display_GUI: Done"
+
+ls *.png | xargs -P 7 -I {} mogrify -resize 600x600! -unsharp 2x1+2+0 {} && zenity --info --text="mogrify: Done"
+
+python example/aligned_crop_face.py ../test && zenity --info --text="Face_Crop: Done"
+
+--------------------------------------
+python example/display_GUI_window_JAPANESE_FACE_V1.py && mv output/*.png ../test && python example/aligned_crop_face.py ../test && zenity --info --text="Face_Crop: Done"
+--------------------------------------
+
+xhost -local:
+```
